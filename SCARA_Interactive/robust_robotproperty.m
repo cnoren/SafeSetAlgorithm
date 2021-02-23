@@ -58,10 +58,13 @@ switch id
         
         %Parameters in dynamics
         robot.param=[];
+        % There is an implicit assumption here that the center of mass of
+        % each of the links is located at the length-centroid of the link
+        % We don't use the extra masses that are currently written out
         robot.param(1)=robot.I(1)+robot.I(2)+(robot.m(1)/4+robot.m(2))*robot.l(1)^2+...
-            robot.m(2)*robot.l(2)^2/4+robot.M(1)*robot.l(1)^2+robot.M(2)*(robot.l(1)^2+robot.l(2)^2);
-        robot.param(2)=robot.I(2)+robot.m(2)*robot.l(2)^2/4+robot.M(2)*robot.l(2)^2;
-        robot.param(3)=robot.m(2)*robot.l(1)*robot.l(2)/2+robot.M(2)*robot.l(1)*robot.l(2);
+            robot.m(2)*robot.l(2)^2/4;
+        robot.param(2)=robot.I(2)+robot.m(2)*robot.l(2)^2/4;
+        robot.param(3)=robot.m(2)*robot.l(1)*robot.l(2)/2;
 
 end
 
