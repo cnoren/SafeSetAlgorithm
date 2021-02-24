@@ -17,7 +17,7 @@ if status==0
     robot.goalhis{t}=goal;
     
     % CALCULATE THE JACOBIAN
-    [Je,H, ~, ~, He]=Jacobi(robot.x(1:robot.nlink,end),robot.x(robot.nlink+1:2*robot.nlink,end),robot.l,robot.nlink,robot.l(end),robot.base,robot.DH);
+    [Je,He]=Jacobi(robot.x(1:robot.nlink,end),robot.x(robot.nlink+1:2*robot.nlink,end),robot.l,robot.nlink,robot.l(end),robot.base,robot.DH);
     % STEPWISE CALCULATION OF THE DYNAMIC MATRICES
     [M,C]=rbt_dyna_matrix(robot.x(:,end),robot.param);
     [M_hat,~]=rbt_dyna_matrix(robot.x(:,end),robot.est_param);
@@ -62,7 +62,7 @@ if status==0
         
         if (vet*U)<thres
             change=thres-vet*U;
-            U=U+M*vet'*pinv(vet*M*vet')*change; % PROBLEM!
+            U=U+M*vet'*pinv(vet*M*vet')*change;
             robot.profile{t}.ssa=1;
         end
         

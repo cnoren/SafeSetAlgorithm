@@ -1,7 +1,7 @@
 %t:theta;dt:dtheta;
 %the Jacobi is for the point on the k-th link and with lenght lk
 
-function [J,H,vec,dvec]=Jacobi(t,dt,l,k,lk,base,DH)
+function [J,H,vec,dvec,H2]=Jacobi(t,dt,l,k,lk,base,DH)
 n=length(t);
 DH(k,3)=lk;
 l(k)=lk;
@@ -29,6 +29,8 @@ switch n
     case 2
         H=[-l(1)*cos(t(1))*dt(1)^2-l(2)*cos(t(1)+t(2))*(dt(1)+dt(2))^2;l(1)*sin(t(1))*dt(1)^2+l(2)*sin(t(1)+t(2))*(dt(1)+dt(2))^2];
         J=[-l(1)*sin(t(1))-l(2)*sin(t(1)+t(2)),-l(2)*sin(t(1)+t(2));l(1)*cos(t(1))+l(2)*cos(t(1)+t(2)),l(2)*cos(t(1)+t(2))];
+        H2 = [-l(1)*cos(t(1))*dt(1) - l(2)*cos(t(1) + t(2))*(dt(1) + dt(2)), -l(2)*cos(t(1) + t(2))*(dt(1) + dt(2));
+             -l(1)*sin(t(1))*dt(1) - l(2)*sin(t(1) + t(2))*(dt(1) + dt(2)), -l(2)*sin(t(1) + t(2))*(dt(1) + dt(2))];
         dvec=[J*dt;0];
     case 3
         

@@ -82,7 +82,7 @@ while flag==0
 %%%%%%%%%%%%%%%%%
     if flag1==0
         %robot=solvelqr(robot);
-        [flag1,robot]=robotmove(t,robot);
+        [flag1,robot]=robust_robotmove(t,robot);
         if flag1~=1
             ie=min([size(robot.x,2),t+1]);
             %plot(robot.x(1,1:ie),robot.x(3,1:ie));

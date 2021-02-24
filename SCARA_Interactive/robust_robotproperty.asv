@@ -55,17 +55,7 @@ switch id
         robot.Kt   =[TC1 TC2]; %Torque constant of the motors (N.m/V)
         robot.DH   =[0 0 robot.l(1) 0;pi/4 0 robot.l(2) 0]; %theta,d,a,alpha
         robot.base =[-30;-30;0]./100; %origin
-
-        %Parameters in dynamics
-        robot.param=[];
-        % There is an implicit assumption here that the center of mass of
-        % each of the links is located at the length-centroid of the link
-        % We don't use the extra masses that are currently written out
-        robot.param(1)=robot.I(1)+robot.I(2)+(robot.m(1)/4+robot.m(2))*robot.l(1)^2+...
-            robot.m(2)*robot.l(2)^2/4;
-        robot.param(2)=robot.I(2)+robot.m(2)*robot.l(2)^2/4;
-        robot.param(3)=robot.m(2)*robot.l(1)*robot.l(2)/2;        
-
+        
         % CALCULATE THE RANGE (estimated params):
         IL1 = computeValInRange(robot.range.IL1(1), robot.range.IL1(2), robot.seed, 1);
         IL2 = computeValInRange(robot.range.IL2(1), robot.range.IL2(2), robot.seed, 1);
@@ -89,16 +79,14 @@ switch id
         % There is an implicit assumption here that the center of mass of
         % each of the links is located at the length-centroid of the link
         % We don't use the extra masses that are currently written out
-        robot.est_param(1)=robot.est_I(1)+robot.est_I(2)+(robot.est_m(1)/4+robot.est_m(2))*robot.est_l(1)^2+...
-            robot.est_m(2)*robot.est_l(2)^2/4;
-        robot.est_param(2)=robot.est_I(2)+robot.est_m(2)*robot.est_l(2)^2/4;
-        robot.est_param(3)=robot.est_m(2)*robot.est_l(1)*robot.est_l(2)/2;
+        robot.est_param(1)=robot.I(1)+robot.I(2)+(robot.m(1)/4+robot.m(2))*robot.l(1)^2+...
+            robot.m(2)*robot.l(2)^2/4;
+        robot.est_param(2)=robot.I(2)+robot.m(2)*robot.l(2)^2/4;
+        robot.est_param(3)=robot.m(2)*robot.l(1)*robot.l(2)/2;
 end
 
-% THESE ARE ROBOT CONTROLLER VALUES FOR SLOTINE
-% ASSUME A CONTROLLER FOR A 2D Robot
-robot.slotinecontroller.KD = 1*eye(2); 
-robot.slotinecontroller.LAMBDA = 15*eye(2);
+
+
 %The kinematic matrices
 robot.A=[eye(robot.nlink) robot.delta_t*eye(robot.nlink);zeros(robot.nlink) eye(robot.nlink)];
 robot.B=[0.5*robot.delta_t^2*eye(robot.nlink);robot.delta_t*eye(robot.nlink)];
