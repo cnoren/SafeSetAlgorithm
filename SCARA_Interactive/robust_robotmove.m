@@ -28,6 +28,8 @@ if status==0
     [qrdot, qrddot, s] = calc_sliding_vars(robot.x(robot.nlink+1:2*robot.nlink,end), goal, robot.wx(1:2,end), robot.wx(4:5,end), Je, He, robot.slotinecontroller.LAMBDA);    
     U = compute_control_slotine(qrddot, qrdot, s, M_hat, C_hat, robot.slotinecontroller.KD);
     robot.u(1:2,t)=U; % STORE THIS FOR USE IN THE SYSTEM
+    robot.est_param = est_params(robot.x(robot.nlink+1:2*robot.nlink,end), robot.x(robot.nlink+1:2*robot.nlink,end), qrdot, qrddot, robot.delta_t, robot.slotinecontroller.Gamma, s, robot.est_parambarrier,  robot.est_param);
+    disp(robot.est_param)
     [~, uwidth] = size(U);
     if uwidth == 2
         disp('yikes1')
@@ -49,12 +51,20 @@ if status==0
         robot.u(1:2,t)=U;
     else
         [Jm,Hm,robot.mx(1:3,t),robot.mx(4:6,t)]=Jacobi(robot.x(1:robot.nlink,end),robot.x(robot.nlink+1:2*robot.nlink,end),robot.l,linkid,ratio,robot.base,robot.DH);
-        
+        [alpha_cond, M_safe, M_safe2, flag] = evolutionary(robot.centerpoint, robot.lowerpoint, robot.upperpoint, Jm, robot.obs.xstar(1:2,t), robot.x(1:2,t), robot.range, robot.grids);
+        M_comb = alpha_cond*M_safe;
+        %M_comb = (M_safe + M_safe2)/2;
+        if flag
+            plotLgPhis(M, M_hat, alpha_cond*M_safe, alpha_cond*M_safe2, alpha_cond*M_comb, Jm, robot.x(1:2,t))
+        end
+        M_hat = M_comb;
+        %[alpha_condLP, M_safeLP, M_safeLP2] = evolutionary(robot.lowerpoint, robot.lowerpoint, robot.upperpoint, Jm, robot.obs.xstar(1:2,t), robot.x(1:2,t), robot.range);
+        %[alpha_condUP, M_safeUP, M_safeUP2] = evolutionary(robot.upperpoint, robot.lowerpoint, robot.upperpoint, Jm, robot.obs.xstar(1:2,t), robot.x(1:2,t), robot.range);
         % Discrete safety index
-        BJ=robot.B*Jm*pinv(M);
+        BJ=robot.B*Jm*pinv(M_hat);
         %D=(robot.A-robot.inf.B{t}(:,1:4))*robot.wx([1,2,4,5],end)-robot.inf.A{t}*robot.obs.xstar(:,end)-robot.inf.B{t}(:,5:6)*robot.obs.goal(:,end)+robot.B*Hm;
         
-        D=robot.A*robot.mx([1,2,4,5],end)+robot.B*(Hm-Jm*pinv(M)*C)-robot.obs.xstar(:,end);
+        D=robot.A*robot.mx([1,2,4,5],end)+robot.B*(Hm-Jm*pinv(M_hat)*C_hat*robot.x(robot.nlink+1:2*robot.nlink,end))-robot.obs.xstar(:,end);
         
         [thres,vet]=safety(D,BJ,robot.margin);
         
@@ -62,7 +72,7 @@ if status==0
         
         if (vet*U)<thres
             change=thres-vet*U;
-            U=U+M*vet'*pinv(vet*M*vet')*change; % PROBLEM!
+            U=U+M_hat*vet'*pinv(vet*M_hat*vet')*change; % PROBLEM!
             robot.profile{t}.ssa=1;
         end
         
@@ -70,13 +80,13 @@ if status==0
         dmin=robot.profile{t}.rmin;
         kd=0.01;
         % Continuous safety index
-        if -dmin^2-kd*dx'*robot.const.P2*dx/dmin>=0
-            vet=dx(1:2)'*Jm*pinv(M)./dmin;
+        if 0.15^2-dmin^2-kd*dx'*robot.const.P2*dx/dmin>=0
+            vet=dx(1:2)'*Jm*pinv(M_hat)./dmin;
             vcirc=dx(3:4)-dx(1:2)*(dx(3:4)'*dx(1:2)/dmin);
-            thres=robot.margin-2*dx'*robot.const.P2*dx+kd*(dx(1:2)'*(Jm*pinv(M)*C-Hm)-norm(vcirc))/dmin;
+            thres=robot.margin-2*dx'*robot.const.P2*dx+kd*(dx(1:2)'*(Jm*pinv(M_hat)*C_hat*robot.x(robot.nlink+1:2*robot.nlink,end)-Hm)-norm(vcirc))/dmin;
             if (vet*U)<thres
                 change=thres-vet*U;
-                U=U+M*vet'*pinv(vet*M*vet')*change;
+                U=U+M_hat*vet'*pinv(vet*M_hat*vet')*change;
                 robot.profile{t}.ssa=1;
             end
         end

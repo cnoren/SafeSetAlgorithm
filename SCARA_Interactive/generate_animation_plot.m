@@ -5,7 +5,7 @@ set(gcf,'Position',get(0,'ScreenSize'),'color','w')
 set(gcf,'renderer','opengl') 
 axis equal
 axis([-0.5 0.5 -0.5 0.5]);
-%grid on;
+grid on;
 box on;
 hold on;
 xlabel('m');

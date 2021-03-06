@@ -157,7 +157,9 @@ while flag==0
     end
     
     
-
+    if mod(t, 50) == 0
+        saveas(gcf, string(t)+'graph.png');
+    end
     pause(0.05); 
 
 end

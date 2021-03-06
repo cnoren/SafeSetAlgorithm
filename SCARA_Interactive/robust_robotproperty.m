@@ -26,11 +26,11 @@ switch id
 %         robot.range.TC2 = [2.420 2.420]; % Range of Motor 2 Torque Constant
 
         % RANGE OF PARAMETERS WE ARE USING:
-        robot.range.IL1 = [00.10 00.20]; % Range of Inertia of Link 1 (L1)
-        robot.range.IL2 = [00.01 00.03]; % Range of Inertia of Link 2 (L2)
+        robot.range.IL1 = [00.15 00.25]; % Range of Inertia of Link 1 (L1)
+        robot.range.IL2 = [00.14 00.14]; % Range of Inertia of Link 2 (L2)
         robot.range.lL1 = [00.30 00.40]; % Range of L1 Length
         robot.range.lL2 = [00.21 00.22]; % Range of L2 Length
-        robot.range.mL1 = [06.80 06.85]; % Range of Mass of L1
+        robot.range.mL1 = [06.75 06.85]; % Range of Mass of L1
         robot.range.mL2 = [03.25 03.30]; % Range of Mass of L2
         robot.range.mM2 = [05.50 05.60]; % Range of Mass of the 2nd motor
         robot.range.mEE = [01.04 01.06]; % Range of Mass of the end effector
@@ -39,8 +39,8 @@ switch id
         % CALCULATE THE RANGE (actual params):
         IL1 = computeValInRange(robot.range.IL1(1), robot.range.IL1(2), robot.seed, 0);
         IL2 = computeValInRange(robot.range.IL2(1), robot.range.IL2(2), robot.seed, 0);
-        Il1 = computeValInRange(robot.range.lL1(1), robot.range.lL1(2), robot.seed, 0);
-        Il2 = computeValInRange(robot.range.lL2(1), robot.range.lL2(2), robot.seed, 0);
+        lL1 = computeValInRange(robot.range.lL1(1), robot.range.lL1(2), robot.seed, 0);
+        lL2 = computeValInRange(robot.range.lL2(1), robot.range.lL2(2), robot.seed, 0);
         mL1 = computeValInRange(robot.range.mL1(1), robot.range.mL1(2), robot.seed, 0);
         mL2 = computeValInRange(robot.range.mL2(1), robot.range.mL2(2), robot.seed, 0);
         mM2 = computeValInRange(robot.range.mM2(1), robot.range.mM2(2), robot.seed, 0);
@@ -49,7 +49,7 @@ switch id
         TC2 = computeValInRange(robot.range.TC2(1), robot.range.TC2(2), robot.seed, 0);
         
         robot.I    =[IL1 IL2]; %Moments of inertia (kg.m^2)
-        robot.l    =[Il1 Il2]; %Length of the links (m)
+        robot.l    =[lL1 lL2]; %Length of the links (m)
         robot.m    =[mL1 mL2]; %Mass of the links (Kg)
         robot.M    =[mM2 mEE]; %Mass of the second motor and the end-effector
         robot.Kt   =[TC1 TC2]; %Torque constant of the motors (N.m/V)
@@ -69,21 +69,25 @@ switch id
         % CALCULATE THE RANGE (estimated params):
         IL1 = computeValInRange(robot.range.IL1(1), robot.range.IL1(2), robot.seed, 1);
         IL2 = computeValInRange(robot.range.IL2(1), robot.range.IL2(2), robot.seed, 1);
-        Il1 = computeValInRange(robot.range.lL1(1), robot.range.lL1(2), robot.seed, 1);
-        Il2 = computeValInRange(robot.range.lL2(1), robot.range.lL2(2), robot.seed, 1);
+        lL1 = computeValInRange(robot.range.lL1(1), robot.range.lL1(2), robot.seed, 1);
+        lL2 = computeValInRange(robot.range.lL2(1), robot.range.lL2(2), robot.seed, 1);
         mL1 = computeValInRange(robot.range.mL1(1), robot.range.mL1(2), robot.seed, 1);
         mL2 = computeValInRange(robot.range.mL2(1), robot.range.mL2(2), robot.seed, 1);
         mM2 = computeValInRange(robot.range.mM2(1), robot.range.mM2(2), robot.seed, 1);
         mEE = computeValInRange(robot.range.mEE(1), robot.range.mEE(2), robot.seed, 1);
         TC1 = computeValInRange(robot.range.TC1(1), robot.range.TC1(2), robot.seed, 1);
         TC2 = computeValInRange(robot.range.TC2(1), robot.range.TC2(2), robot.seed, 1);
-        
+
         robot.est_I    =[IL1 IL2]; %Moments of inertia (kg.m^2)
-        robot.est_l    =[Il1 Il2]; %Length of the links (m)
+        robot.est_l    =[lL1 lL2]; %Length of the links (m)
         robot.est_m    =[mL1 mL2]; %Mass of the links (Kg)
         robot.est_M    =[mM2 mEE]; %Mass of the second motor and the end-effector
         robot.est_Kt   =[TC1 TC2]; %Torque constant of the motors (N.m/V)
         robot.est_DH   =[0 0 robot.l(1) 0;pi/4 0 robot.l(2) 0]; %theta,d,a,alpha
+
+        robot.lowerpoint  = [robot.range.IL1(1); robot.range.IL2(1); robot.range.lL1(1); robot.range.lL2(1); robot.range.mL1(1); robot.range.mL2(1); robot.range.mM2(1); robot.range.mEE(1); robot.range.TC1(1); robot.range.TC2(1)];
+        robot.upperpoint  = [robot.range.IL1(2); robot.range.IL2(2); robot.range.lL1(2); robot.range.lL2(2); robot.range.mL1(2); robot.range.mL2(2); robot.range.mM2(2); robot.range.mEE(2); robot.range.TC1(2); robot.range.TC2(2)];
+        robot.centerpoint = [IL1; IL2; lL1; lL2; mL1; mL2; mM2; mEE; TC1; TC2];
         %Parameters in dynamics -- this time, for estimation
         robot.est_param=[];
         % There is an implicit assumption here that the center of mass of
@@ -93,12 +97,42 @@ switch id
             robot.est_m(2)*robot.est_l(2)^2/4;
         robot.est_param(2)=robot.est_I(2)+robot.est_m(2)*robot.est_l(2)^2/4;
         robot.est_param(3)=robot.est_m(2)*robot.est_l(1)*robot.est_l(2)/2;
+        est_param_1_LB = robot.range.IL1(1)+robot.range.IL2(1)+(robot.range.mL1(1)/4+robot.range.mL2(1))*robot.range.lL1(1)^2+...
+            robot.range.mL2(1)*robot.range.lL2(1)^2/4;
+        est_param_1_UB = robot.range.IL1(2)+robot.range.IL2(2)+(robot.range.mL1(2)/4+robot.range.mL2(2))*robot.range.lL1(2)^2+...
+            robot.range.mL2(2)*robot.range.lL2(2)^2/4;
+        est_param_2_LB = robot.range.IL2(1)+robot.range.mL2(1)*robot.range.lL2(1)^2/4;
+        est_param_2_UB = robot.range.IL2(2)+robot.range.mL2(2)*robot.range.lL2(2)^2/4;
+        est_param_3_LB = robot.range.mL2(1)*robot.range.lL1(1)*robot.range.lL2(1)/2;
+        est_param_3_UB = robot.range.mL2(2)*robot.range.lL1(2)*robot.range.lL2(2)/2;
+        robot.est_parambarrier(1,1) = est_param_1_LB; 
+        robot.est_parambarrier(1,2) = est_param_1_UB;
+        robot.est_parambarrier(2,1) = est_param_2_LB;
+        robot.est_parambarrier(2,2) = est_param_2_UB;
+        robot.est_parambarrier(3,1) = est_param_3_LB;
+        robot.est_parambarrier(3,2) = est_param_3_UB;
 end
 
+gridIL1 = linspace(robot.range.IL1(1), robot.range.IL1(2), 4);
+gridIL2 = linspace(robot.range.IL2(1), robot.range.IL2(2), 4);
+gridlL1 = linspace(robot.range.lL1(1), robot.range.lL1(2), 4);
+gridlL2 = linspace(robot.range.lL2(1), robot.range.lL2(2), 4);
+gridmL1 = linspace(robot.range.mL1(1), robot.range.mL1(2), 4);
+gridmL2 = linspace(robot.range.mL2(1), robot.range.mL2(2), 4);
+
+[X1, X2, X3, X4, X5, X6] = ndgrid(gridIL1, gridIL2, gridlL1, gridlL2, gridmL1, gridmL2);
+alphaGrid = X1+X2+(X5./4+X6).*X3.^2+X6.*X4.^2/4;
+robot.grids.reshapedalphaGrid = vertcat(alphaGrid(:));
+betaGrid = X2+X6.*X4.^2./4;
+robot.grids.reshapedbetaGrid = vertcat(betaGrid(:));
+epsilonGrid = X6.*X3.*X4.^2/2;
+robot.grids.reshapedepsilonGrid = vertcat(epsilonGrid(:));
+%robot.abe_funclist = @(x,rs,cx)safety_dot_cond_discret(robot.reshapedalphaGrid, robot.reshapedbetaGrid, robot.reshapedepsilonGrid, x, rs, cx);
 % THESE ARE ROBOT CONTROLLER VALUES FOR SLOTINE
 % ASSUME A CONTROLLER FOR A 2D Robot
 robot.slotinecontroller.KD = 1*eye(2); 
 robot.slotinecontroller.LAMBDA = 15*eye(2);
+robot.slotinecontroller.Gamma = [30, 0, 0; 0, 50, 0; 0, 0, 10];
 %The kinematic matrices
 robot.A=[eye(robot.nlink) robot.delta_t*eye(robot.nlink);zeros(robot.nlink) eye(robot.nlink)];
 robot.B=[0.5*robot.delta_t^2*eye(robot.nlink);robot.delta_t*eye(robot.nlink)];
