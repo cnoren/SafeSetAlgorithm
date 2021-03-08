@@ -3,7 +3,7 @@ switch id
     case 1
         %the constants
         robot.nlink=2;
-        robot.umax=[5,2]; %m/s^2
+        robot.umax=[2,1]; %m/s^2
         robot.margin=0.05;
         robot.delta_t=0.05;
         robot.wmax=1; %rad/s
@@ -26,12 +26,12 @@ switch id
 %         robot.range.TC2 = [2.420 2.420]; % Range of Motor 2 Torque Constant
 
         % RANGE OF PARAMETERS WE ARE USING:
-        robot.range.IL1 = [00.15 00.25]; % Range of Inertia of Link 1 (L1)
-        robot.range.IL2 = [00.14 00.14]; % Range of Inertia of Link 2 (L2)
-        robot.range.lL1 = [00.30 00.40]; % Range of L1 Length
-        robot.range.lL2 = [00.21 00.22]; % Range of L2 Length
-        robot.range.mL1 = [06.75 06.85]; % Range of Mass of L1
-        robot.range.mL2 = [03.25 03.30]; % Range of Mass of L2
+        robot.range.lL1 = [00.30 00.30]; % Range of L1 Length
+        robot.range.lL2 = [00.20 00.20]; % Range of L2 Length
+        robot.range.mL1 = [26.75 26.85]; % Range of Mass of L1
+        robot.range.mL2 = [04.25 14.30]; % Range of Mass of L2
+        robot.range.IL1 = [robot.range.mL1(1)*(robot.range.lL1(1)/2)^2 robot.range.mL1(2)*(robot.range.lL1(2)/2)^2]; % Range of Inertia of Link 1 (L1)
+        robot.range.IL2 = [robot.range.mL2(1)*(robot.range.lL2(1)/2)^2 robot.range.mL2(2)*(robot.range.lL2(2)/2)^2]; % Range of Inertia of Link 2 (L2)
         robot.range.mM2 = [05.50 05.60]; % Range of Mass of the 2nd motor
         robot.range.mEE = [01.04 01.06]; % Range of Mass of the end effector
         robot.range.TC1 = [22.35 22.37]; % Range of Motor 1 Torque Constant
@@ -113,18 +113,21 @@ switch id
         robot.est_parambarrier(3,2) = est_param_3_UB;
 end
 
-gridIL1 = linspace(robot.range.IL1(1), robot.range.IL1(2), 15);
-gridIL2 = linspace(robot.range.IL2(1), robot.range.IL2(2), 15);
-gridlL1 = linspace(robot.range.lL1(1), robot.range.lL1(2), 15);
-gridlL2 = linspace(robot.range.lL2(1), robot.range.lL2(2), 15);
-gridmL1 = linspace(robot.range.mL1(1), robot.range.mL1(2), 15);
-gridmL2 = linspace(robot.range.mL2(1), robot.range.mL2(2), 15);
+gridIL1 = linspace(robot.range.IL1(1), robot.range.IL1(2), 4);
+gridIL2 = linspace(robot.range.IL2(1), robot.range.IL2(2), 4);
+gridlL1 = linspace(robot.range.lL1(1), robot.range.lL1(2), 4);
+gridlL2 = linspace(robot.range.lL2(1), robot.range.lL2(2), 4);
+gridmL1 = linspace(robot.range.mL1(1), robot.range.mL1(2), 4);
+gridmL2 = linspace(robot.range.mL2(1), robot.range.mL2(2), 4);
 
-abe_list = [];
 [X1, X2, X3, X4, X5, X6] = ndgrid(gridIL1, gridIL2, gridlL1, gridlL2, gridmL1, gridmL2);
 alphaGrid = X1+X2+(X5./4+X6).*X3.^2+X6.*X4.^2/4;
+robot.grids.reshapedalphaGrid = vertcat(alphaGrid(:));
 betaGrid = X2+X6.*X4.^2./4;
-epsilonGrid = 
+robot.grids.reshapedbetaGrid = vertcat(betaGrid(:));
+epsilonGrid = X6.*X3.*X4.^2/2;
+robot.grids.reshapedepsilonGrid = vertcat(epsilonGrid(:));
+%robot.abe_funclist = @(x,rs,cx)safety_dot_cond_discret(robot.reshapedalphaGrid, robot.reshapedbetaGrid, robot.reshapedepsilonGrid, x, rs, cx);
 % THESE ARE ROBOT CONTROLLER VALUES FOR SLOTINE
 % ASSUME A CONTROLLER FOR A 2D Robot
 robot.slotinecontroller.KD = 1*eye(2); 

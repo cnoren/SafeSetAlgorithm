@@ -1,5 +1,6 @@
 function agent=agentproperty(interact)
 agent.umax=0.05;
+agent.cursor_position = zeros(2,1);
 agent.delta_t=0.1;
 agent.A=[1 0 agent.delta_t 0 ;0 1 0 agent.delta_t;0 0 1 0;0 0 0 1];
 agent.B=[0.5*agent.delta_t^2 0;0 0.5*agent.delta_t^2;agent.delta_t 0;0 agent.delta_t];

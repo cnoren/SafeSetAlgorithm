@@ -21,42 +21,63 @@ flag=0;%sign that the game is down
 flag1=0;%sign that robot has finished all the task
 flag2=0;%sign that human has finished all the task
 
-use_cursor=1;%use defined agent or cursor
-
+use_cursor=0;%use defined agent or cursor
+standstill_flag = 0% use recorded data, stand still
+noviol_flag = 1 % Use some prior defined data
+if use_cursor==0
+    if standstill_flag ==1
+        cp = load('standstill_cursor.mat');
+        cp = cp.cp;
+    elseif noviol_flag == 1
+        cp = load('test.mat');
+        cursor_pos_center = cp.cursor_pos_center;
+        cursor_pos_URcorner = cp.cursor_pos_URcorner;
+        cp = cp.acp;
+    end
+end
 t=1;%count time step
+exp_num = 0; % This is for seeding the goals.
+exp_rng = rng(exp_num); % This is the actual rng 
+num_goals = 100; % This is the number of goals we want
+num_goal_counter_robot = 1; % The goal we are on for the robot
+num_goal_counter_agent = 1; % The goal we are on for the robot
+all_goals = randn(2,num_goals*2)./5;
+robo_goals = all_goals(:,1:num_goals);
+agent_goals = all_goals(:,(num_goals+1):2*num_goals);
 
 %% initialize the control plot
 generate_animation_plot;
-calibmark.xy = [0.5; 0.5];
-calibmark.handle = plot(calibmark.xy(1),calibmark.xy(2),'o','linewidth',3,'color','b','markersize',14);
-set(calibmark.handle,'XDataSource','calibmark.xy(1)');
-set(calibmark.handle,'YDataSource','calibmark.xy(2)');
 
 %% calibrate the control before the test
+if use_cursor == 1
+    calibmark.xy = [0.5; 0.5];
+    calibmark.handle = plot(calibmark.xy(1),calibmark.xy(2),'o','linewidth',3,'color','b','markersize',14);
+    set(calibmark.handle,'XDataSource','calibmark.xy(1)');
+    set(calibmark.handle,'YDataSource','calibmark.xy(2)');
 
-calibmark.xy = [0; 0];
-refreshdata([calibmark.handle],'caller');
-drawnow;
-pause(3)
-cursor_pos_center = get(0,'PointerLocation');
+    calibmark.xy = [0; 0];
+    refreshdata([calibmark.handle],'caller');
+    drawnow;
+    pause(3)
+    cursor_pos_center = get(0,'PointerLocation');
 
-calibmark.xy = [0.5,0.5];
-refreshdata([calibmark.handle],'caller');
-drawnow;
-pause(3)
-cursor_pos_URcorner = get(0,'PointerLocation');
+    calibmark.xy = [0.5,0.5];
+    refreshdata([calibmark.handle],'caller');
+    drawnow;
+    pause(3)
+    cursor_pos_URcorner = get(0,'PointerLocation');
 
-calibmark.xy = [10; 10];
-refreshdata([calibmark.handle],'caller');
-drawnow;
-
+    calibmark.xy = [10; 10];
+    refreshdata([calibmark.handle],'caller');
+    drawnow;
+end
 %% begin testing
 set(text1handle,'string','Test runing...')
 
 J = eye(2); % [-1 2; 10 5];
 goalhis=[];
-
-while flag==0
+t0 = tic();
+while flag==0 && t<1001 && num_goal_counter_robot <= num_goals && num_goal_counter_agent <= num_goals
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  robot observe agent        %
@@ -106,7 +127,12 @@ while flag==0
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % update the agent position   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    cursor_pos_current = get(0,'PointerLocation');
+    if use_cursor == 1
+        cursor_pos_current = get(0,'PointerLocation');
+    else
+        cursor_pos_current = cp(:,t)';
+    end
+    agent.cursor_position(:, t) = cursor_pos_current';
     u = (cursor_pos_current - cursor_pos_center)./(cursor_pos_URcorner - cursor_pos_center); % normalized
     agent.x(1,end+1) = u(1)/2;
     agent.x(2,end) = u(2)/2;
@@ -133,7 +159,9 @@ while flag==0
     drawnow;
     
     if norm(robot.wx(1:2,end)-robot.Goal(:,1))<0.02
-        robot.Goal=randn(2,1)./5;
+        %robot.Goal=randn(2,1)./5; % THIS IS THE ROBOT GOAL
+        num_goal_counter_robot = num_goal_counter_robot + 1;
+        robot.Goal = robo_goals(:,num_goal_counter_robot);
         if norm(robot.Goal-robot.base(1:2))<norm(robot.l(1)-robot.l(2))
             robot.Goal=(robot.Goal-robot.base(1:2))/norm(robot.Goal-robot.base(1:2))*norm(robot.l(1)-robot.l(2))+robot.base(1:2);
         end
@@ -144,7 +172,9 @@ while flag==0
     
     agent.goalhis{t}=agent.Goal;
     if norm(agent.x(1:2,end)-agent.Goal(:,1))<0.01
-        agent.Goal=randn(2,1)./5;
+        %agent.Goal=randn(2,1)./5; % THIS IS THE HUMAN GOAL
+        num_goal_counter_agent = num_goal_counter_agent + 1;
+        agent.Goal = agent_goals(:,num_goal_counter_agent);
         if norm(agent.Goal-robot.base(1:2))<0.25
             agent.Goal=robot.base(1:2)+(agent.Goal-robot.base(1:2))*0.25/norm(agent.Goal-robot.base(1:2));
         end
@@ -157,11 +187,19 @@ while flag==0
     end
     
     
+    %% THIS IS JUST PLOTTING, HERE!
     if mod(t, 50) == 0
         saveas(gcf, string(t)+'graph.png');
     end
     pause(0.05); 
 
 end
-
+dt = toc(t0)
+disp('End Condition')
+disp('TIME FINISHED')
+disp(t<1001)
+disp('ROBOT NO MORE GOALS')
+disp(num_goal_counter_robot <= num_goals)
+disp('AGENT NO MORE GOALS')
+disp(num_goal_counter_agent <= num_goals)
 set(text1handle,'string','Test ended')

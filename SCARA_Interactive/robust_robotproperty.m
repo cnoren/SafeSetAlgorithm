@@ -3,7 +3,7 @@ switch id
     case 1
         %the constants
         robot.nlink=2;
-        robot.umax=[5,2]; %m/s^2
+        robot.umax=[20, 20]; %m/s^2
         robot.margin=0.05;
         robot.delta_t=0.05;
         robot.wmax=1; %rad/s
@@ -26,12 +26,12 @@ switch id
 %         robot.range.TC2 = [2.420 2.420]; % Range of Motor 2 Torque Constant
 
         % RANGE OF PARAMETERS WE ARE USING:
-        robot.range.IL1 = [00.15 00.25]; % Range of Inertia of Link 1 (L1)
-        robot.range.IL2 = [00.14 00.14]; % Range of Inertia of Link 2 (L2)
-        robot.range.lL1 = [00.30 00.40]; % Range of L1 Length
-        robot.range.lL2 = [00.21 00.22]; % Range of L2 Length
-        robot.range.mL1 = [06.75 06.85]; % Range of Mass of L1
-        robot.range.mL2 = [03.25 03.30]; % Range of Mass of L2
+        robot.range.lL1 = [00.25 00.25]; % Range of L1 Length
+        robot.range.lL2 = [00.27 00.27]; % Range of L2 Length
+        robot.range.mL1 = [26.75 26.85]; % Range of Mass of L1
+        robot.range.mL2 = [14.25 14.30]; % Range of Mass of L2
+        robot.range.IL1 = [robot.range.mL1(1)*(robot.range.lL1(1)/2)^2 robot.range.mL1(2)*(robot.range.lL1(2)/2)^2]; % Range of Inertia of Link 1 (L1)
+        robot.range.IL2 = [robot.range.mL2(1)*(robot.range.lL2(1)/2)^2 robot.range.mL2(2)*(robot.range.lL2(2)/2)^2]; % Range of Inertia of Link 2 (L2)
         robot.range.mM2 = [05.50 05.60]; % Range of Mass of the 2nd motor
         robot.range.mEE = [01.04 01.06]; % Range of Mass of the end effector
         robot.range.TC1 = [22.35 22.37]; % Range of Motor 1 Torque Constant
@@ -130,9 +130,9 @@ robot.grids.reshapedepsilonGrid = vertcat(epsilonGrid(:));
 %robot.abe_funclist = @(x,rs,cx)safety_dot_cond_discret(robot.reshapedalphaGrid, robot.reshapedbetaGrid, robot.reshapedepsilonGrid, x, rs, cx);
 % THESE ARE ROBOT CONTROLLER VALUES FOR SLOTINE
 % ASSUME A CONTROLLER FOR A 2D Robot
-robot.slotinecontroller.KD = 1*eye(2); 
+robot.slotinecontroller.KD = 5*eye(2); 
 robot.slotinecontroller.LAMBDA = 15*eye(2);
-robot.slotinecontroller.Gamma = [30, 0, 0; 0, 50, 0; 0, 0, 10];
+robot.slotinecontroller.Gamma = [60, 0, 0; 0, 100, 0; 0, 0, 20];
 %The kinematic matrices
 robot.A=[eye(robot.nlink) robot.delta_t*eye(robot.nlink);zeros(robot.nlink) eye(robot.nlink)];
 robot.B=[0.5*robot.delta_t^2*eye(robot.nlink);robot.delta_t*eye(robot.nlink)];

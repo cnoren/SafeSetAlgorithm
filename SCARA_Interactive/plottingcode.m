@@ -8,8 +8,8 @@ end
 figure
 hold on
 grid on
-p1 = plot(1:1:length(robot.profile)-99, rmin_list(1:length(robot.profile)-99), 'linewidth', 2);
-p2 = plot(1:1:length(robot.profile)-99, 0.15*ones(500,1), 'linewidth', 2);
+p1 = plot(1:1:length(robot.profile), rmin_list(1:length(robot.profile)), 'linewidth', 2);
+p2 = plot(1:1:length(robot.profile), 0.15*ones(1000,1), 'linewidth', 2);
 lgd = legend([p1, p2], 'Minimum Distance to Manipulator', 'Safe Distance', 'interpreter','latex');
 lgd.FontSize = 12;
 xlabel('Time Step', 'interpreter','latex', 'FontSize', 12)
