@@ -189,7 +189,29 @@ while flag==0 && t<1001 && num_goal_counter_robot <= num_goals && num_goal_count
     
     %% THIS IS JUST PLOTTING, HERE!
     if mod(t, 50) == 0
+        p1 = plot(robot.pos(1:3:(robot.nlink*3+1),end-1),robot.pos(2:3:(robot.nlink*3+3),end-1),'linewidth',10,'color',[1,0.1,0.1],'markersize',50);
+        p2 = plot(robot.pos(1:3:(robot.nlink*3+1),end-2),robot.pos(2:3:(robot.nlink*3+3),end-2),'linewidth',10,'color',[1,0.2,0.2],'markersize',50);
+        p3 = plot(robot.pos(1:3:(robot.nlink*3+1),end-4),robot.pos(2:3:(robot.nlink*3+3),end-4),'linewidth',10,'color',[1,0.3,0.3],'markersize',50);
+        p4 = plot(robot.pos(1:3:(robot.nlink*3+1),end-8),robot.pos(2:3:(robot.nlink*3+3),end-8),'linewidth',10,'color',[1,0.4,0.4],'markersize',50);
+        p5 = plot(robot.pos(1:3:(robot.nlink*3+1),end-12),robot.pos(2:3:(robot.nlink*3+3),end-12),'linewidth',10,'color',[1,0.5,0.5],'markersize',50);
+        p6 = plot(robot.pos(1:3:(robot.nlink*3+1),end-16),robot.pos(2:3:(robot.nlink*3+3),end-16),'linewidth',10,'color',[1,0.6,0.6],'markersize',50);
+        p7 = plot(robot.pos(1:3:(robot.nlink*3+1),end-20),robot.pos(2:3:(robot.nlink*3+3),end-20),'linewidth',10,'color',[1,0.7,0.7],'markersize',50);
+        p8 = plot(robot.pos(1:3:(robot.nlink*3+1),end-24),robot.pos(2:3:(robot.nlink*3+3),end-24),'linewidth',10,'color',[1,0.8,0.8],'markersize',50);
+        p9 = plot(robot.pos(1:3:(robot.nlink*3+1),end-28),robot.pos(2:3:(robot.nlink*3+3),end-28),'linewidth',10,'color',[1,0.9,0.9],'markersize',50);
+        a1 = plot(agent.x(1,end-1),agent.x(2,end-1),'.','linewidth',3,'color',[0.50,0.50,1],'markersize',200);
+        a2 = plot(agent.x(1,end-2),agent.x(2,end-2),'.','linewidth',3,'color',[0.55,0.55,1],'markersize',200);
+        a3 = plot(agent.x(1,end-4),agent.x(2,end-4),'.','linewidth',3,'color',[0.60,0.60,1],'markersize',200);
+        a4 = plot(agent.x(1,end-8),agent.x(2,end-8),'.','linewidth',3,'color',[0.65,0.65,1],'markersize',200);
+        a5 = plot(agent.x(1,end-12),agent.x(2,end-12),'.','linewidth',3,'color',[0.70,0.70,1],'markersize',200);
+        a6 = plot(agent.x(1,end-16),agent.x(2,end-16),'.','linewidth',3,'color',[0.75,0.75,1],'markersize',200);
+        a7 = plot(agent.x(1,end-20),agent.x(2,end-20),'.','linewidth',3,'color',[0.80,0.80,1],'markersize',200);
+        a8 = plot(agent.x(1,end-24),agent.x(2,end-24),'.','linewidth',3,'color',[0.85,0.85,1],'markersize',200);
+        a9 = plot(agent.x(1,end-28),agent.x(2,end-28),'.','linewidth',3,'color',[0.90,0.90,1],'markersize',200);
         saveas(gcf, string(t)+'graph.png');
+        delete(p1); delete(p2); delete(p3); delete(p4); delete(p5);
+        delete(p6); delete(p7); delete(p8); delete(p9);
+        delete(a1); delete(a2); delete(a3); delete(a4); delete(a5);
+        delete(a6); delete(a7); delete(a8); delete(a9);
     end
     pause(0.05); 
 

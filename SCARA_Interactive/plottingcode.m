@@ -33,8 +33,8 @@ close
 figure
 hold on
 grid on
-p1 = plot(1:1:length(robot.u)-99, robot.u(1,1:length(robot.u)-99), 'linewidth', 2);
-p2 = plot(1:1:length(robot.u)-99, robot.u(2,1:length(robot.u)-99), 'linewidth', 2);
+p1 = plot(1:1:length(robot.u)-100, robot.u(1,1:length(robot.u)-100), 'linewidth', 2);
+p2 = plot(1:1:length(robot.u)-100, robot.u(2,1:length(robot.u)-100), 'linewidth', 2);
 lgd = legend([p1, p2], 'Torque, Joint 1', 'Torque, Joint 2', 'interpreter','latex');
 lgd.FontSize = 12;
 xlabel('Time Step', 'interpreter','latex', 'FontSize', 12)

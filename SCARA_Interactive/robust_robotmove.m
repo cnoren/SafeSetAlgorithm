@@ -57,7 +57,8 @@ if status==0
         if flag
             plotLgPhis(M, M_hat, alpha_cond*M_safe, alpha_cond*M_safe2, alpha_cond*M_comb, Jm, robot.x(1:2,t))
         end
-        M_hat = M_comb;
+        %M_hat = M_comb %If you want g^*
+        M_hat = M_hat; %If you want ghat
         %[alpha_condLP, M_safeLP, M_safeLP2] = evolutionary(robot.lowerpoint, robot.lowerpoint, robot.upperpoint, Jm, robot.obs.xstar(1:2,t), robot.x(1:2,t), robot.range);
         %[alpha_condUP, M_safeUP, M_safeUP2] = evolutionary(robot.upperpoint, robot.lowerpoint, robot.upperpoint, Jm, robot.obs.xstar(1:2,t), robot.x(1:2,t), robot.range);
         % Discrete safety index
@@ -80,7 +81,11 @@ if status==0
         dmin=robot.profile{t}.rmin;
         kd=0.01;
         % Continuous safety index
-        if 0.15^2-dmin^2-kd*dx'*robot.const.P2*dx/dmin>=0
+
+        dxi= (robot.est_param' - [robot.est_param1_mid; robot.est_param2_mid; robot.est_param3_mid]);
+        %if 0.15^2-dmin^2-kd*dx'*robot.const.P2*dx/dmin>=0
+        
+        if 0.15^2-dmin^2-kd*dx'*robot.const.P2*dx/dmin + 1150*(dxi' * diag([1/robot.est_param1_mid, 1/robot.est_param2_mid, 1/robot.est_param3_mid])*dxi)>=0
             vet=dx(1:2)'*Jm*pinv(M_hat)./dmin;
             vcirc=dx(3:4)-dx(1:2)*(dx(3:4)'*dx(1:2)/dmin);
             thres=robot.margin-2*dx'*robot.const.P2*dx+kd*(dx(1:2)'*(Jm*pinv(M_hat)*C_hat*robot.x(robot.nlink+1:2*robot.nlink,end)-Hm)-norm(vcirc))/dmin;

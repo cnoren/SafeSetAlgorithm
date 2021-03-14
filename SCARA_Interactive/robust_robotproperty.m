@@ -105,12 +105,16 @@ switch id
         est_param_2_UB = robot.range.IL2(2)+robot.range.mL2(2)*robot.range.lL2(2)^2/4;
         est_param_3_LB = robot.range.mL2(1)*robot.range.lL1(1)*robot.range.lL2(1)/2;
         est_param_3_UB = robot.range.mL2(2)*robot.range.lL1(2)*robot.range.lL2(2)/2;
+        
         robot.est_parambarrier(1,1) = est_param_1_LB; 
         robot.est_parambarrier(1,2) = est_param_1_UB;
         robot.est_parambarrier(2,1) = est_param_2_LB;
         robot.est_parambarrier(2,2) = est_param_2_UB;
         robot.est_parambarrier(3,1) = est_param_3_LB;
         robot.est_parambarrier(3,2) = est_param_3_UB;
+        robot.est_param1_mid = (est_param_1_LB + est_param_1_UB)/2;
+        robot.est_param2_mid = (est_param_2_LB + est_param_2_UB)/2;
+        robot.est_param3_mid = (est_param_3_LB + est_param_3_UB)/2; 
 end
 
 gridIL1 = linspace(robot.range.IL1(1), robot.range.IL1(2), 4);
